@@ -16,9 +16,11 @@ export default class MainScene extends Phaser.Scene {
     const H = this.scale.height;
 
     // Premium Loading UI
+    const isMobile = W < 600;
+
     // "SHOCKY" in Orange with Black Border
-    this.shockyText = this.add.text(W / 2 - 100, H / 2 - 80, "SHOCKY", {
-      fontSize: "64px",
+    this.shockyText = this.add.text(W / 2, H / 2 - (isMobile ? 120 : 140), "SHOCKY", {
+      fontSize: isMobile ? "50px" : "72px",
       fill: "#ff8c00",
       stroke: "#000",
       strokeThickness: 8,
@@ -27,8 +29,8 @@ export default class MainScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // "UNIVERSE" in Blue with White Border
-    this.universeText = this.add.text(W / 2 + 100, H / 2 - 80, "UNIVERSE", {
-      fontSize: "52px",
+    this.universeText = this.add.text(W / 2, H / 2 - (isMobile ? 65 : 75), "UNIVERSE", {
+      fontSize: isMobile ? "40px" : "58px",
       fill: "#00bfff",
       stroke: "#fff",
       strokeThickness: 4,
