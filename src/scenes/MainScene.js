@@ -64,6 +64,9 @@ export default class MainScene extends Phaser.Scene {
 
     this.load.on("complete", () => {
       this.loadingFinished = true;
+      if (this.forcedLoadComplete) {
+        this.cleanupLoadingUI();
+      }
     });
 
     // Forced 2-second look
