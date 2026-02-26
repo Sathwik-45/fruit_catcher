@@ -15,30 +15,73 @@ export default class MainScene extends Phaser.Scene {
     const W = this.scale.width;
     const H = this.scale.height;
 
-    // Loading UI
-    this.loadingText = this.add.text(W / 2, H / 2 - 50, "SHOCKY UNIVERSE", {
-      fontSize: "42px",
-      fill: "#ffffff",
+    // Premium Loading UI
+    // "SHOCKY" in Orange with Black Border
+    this.shockyText = this.add.text(W / 2 - 100, H / 2 - 80, "SHOCKY", {
+      fontSize: "64px",
+      fill: "#ff8c00",
+      stroke: "#000",
+      strokeThickness: 8,
       fontWeight: "900",
       fontFamily: "Arial Black"
     }).setOrigin(0.5);
 
-    const progressBar = this.add.graphics();
+    // "UNIVERSE" in Blue with White Border
+    this.universeText = this.add.text(W / 2 + 100, H / 2 - 80, "UNIVERSE", {
+      fontSize: "52px",
+      fill: "#00bfff",
+      stroke: "#fff",
+      strokeThickness: 4,
+      fontWeight: "900",
+      fontFamily: "Arial Black"
+    }).setOrigin(0.5);
+
+    // Awesome Progress Bar (Glow Effect)
     const progressBox = this.add.graphics();
-    progressBox.fillStyle(0x222222, 0.8);
-    progressBox.fillRect(W / 2 - 160, H / 2, 320, 50);
+    const progressBar = this.add.graphics();
+    const progressGlow = this.add.graphics();
+
+    // Sleek White/Grey Box
+    progressBox.fillStyle(0xffffff, 0.2);
+    progressBox.fillRoundedRect(W / 2 - 160, H / 2 - 10, 320, 40, 10);
+    progressBox.lineStyle(2, 0xffffff, 1);
+    progressBox.strokeRoundedRect(W / 2 - 160, H / 2 - 10, 320, 40, 10);
+
+    this.loadingFinished = false;
 
     this.load.on("progress", (value) => {
       progressBar.clear();
+      progressGlow.clear();
+
+      // Neon Green Glow
+      progressGlow.fillStyle(0x00ff00, 0.3);
+      progressGlow.fillRoundedRect(W / 2 - 155, H / 2 - 5, 310 * value, 30, 8);
+
+      // Solid Neon Green Bar
       progressBar.fillStyle(0x00ff00, 1);
-      progressBar.fillRect(W / 2 - 150, H / 2 + 10, 300 * value, 30);
+      progressBar.fillRoundedRect(W / 2 - 150, H / 2, 300 * value, 20, 5);
     });
 
     this.load.on("complete", () => {
-      progressBar.destroy();
-      progressBox.destroy();
-      this.loadingText.destroy();
+      this.loadingFinished = true;
     });
+
+    // Forced 2-second look
+    this.forcedLoadComplete = false;
+    this.time.delayedCall(2000, () => {
+      this.forcedLoadComplete = true;
+      if (this.loadingFinished) {
+        this.cleanupLoadingUI();
+      }
+    });
+
+    this.cleanupLoadingUI = () => {
+      progressBox.destroy();
+      progressBar.destroy();
+      progressGlow.destroy();
+      this.shockyText.destroy();
+      this.universeText.destroy();
+    };
 
     // images
     this.load.image("bg", "assets/bg.jpg");
