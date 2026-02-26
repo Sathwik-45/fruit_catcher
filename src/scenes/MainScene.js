@@ -11,6 +11,34 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
+    // responsive width/height for loading screen
+    const W = this.scale.width;
+    const H = this.scale.height;
+
+    // Loading UI
+    this.loadingText = this.add.text(W / 2, H / 2 - 50, "SHOCKY UNIVERSE", {
+      fontSize: "42px",
+      fill: "#ffffff",
+      fontWeight: "900",
+      fontFamily: "Arial Black"
+    }).setOrigin(0.5);
+
+    const progressBar = this.add.graphics();
+    const progressBox = this.add.graphics();
+    progressBox.fillStyle(0x222222, 0.8);
+    progressBox.fillRect(W / 2 - 160, H / 2, 320, 50);
+
+    this.load.on("progress", (value) => {
+      progressBar.clear();
+      progressBar.fillStyle(0x00ff00, 1);
+      progressBar.fillRect(W / 2 - 150, H / 2 + 10, 300 * value, 30);
+    });
+
+    this.load.on("complete", () => {
+      progressBar.destroy();
+      progressBox.destroy();
+      this.loadingText.destroy();
+    });
 
     // images
     this.load.image("bg", "assets/bg.jpg");
@@ -90,8 +118,9 @@ export default class MainScene extends Phaser.Scene {
     // Also try to play when the sound manager is unlocked by Phaser
     this.sound.once("unlocked", playBGM);
 
-    // basket
-    this.basket = this.physics.add.sprite(W / 2, H - 80, "basket");
+    // Basket & Physics (Higher on mobile for finger space)
+    const basketY = W < 600 ? H - 140 : H - 80;
+    this.basket = this.physics.add.sprite(W / 2, basketY, "basket");
     this.basket.setImmovable(true);
     this.basket.body.allowGravity = false;
     this.basket.setCollideWorldBounds(true);
@@ -102,7 +131,7 @@ export default class MainScene extends Phaser.Scene {
     this.basket.body.setOffset(25, 60);
 
     // ⭐ invisible catch zone (DYNAMIC BODY FIX)
-    this.catchZone = this.add.rectangle(W / 2, H - 120, 220, 50, 0x000000, 0);
+    this.catchZone = this.add.rectangle(W / 2, basketY - 40, 220, 50, 0x000000, 0);
     this.physics.add.existing(this.catchZone);
     this.catchZone.body.allowGravity = false;
     this.catchZone.body.setImmovable(true);
@@ -147,9 +176,10 @@ export default class MainScene extends Phaser.Scene {
 
     this.updateBackground();
 
-    // Reposition Basket
-    this.basket.setPosition(W / 2, H - 80);
-    this.catchZone.setPosition(W / 2, H - 120);
+    // Reposition Basket (Higher on mobile)
+    const basketY = W < 600 ? H - 120 : H - 80;
+    this.basket.setPosition(W / 2, basketY);
+    this.catchZone.setPosition(W / 2, basketY - 40);
 
     // Keep caught fruits in basket
     this.caughtFruits.forEach(item => {
